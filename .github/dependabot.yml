@@ -1,0 +1,138 @@
+# .github/dependabot.yml
+#
+# Demo config for the org's stack: Java (Maven), Node.js + TypeScript (npm),
+# Python (pip), and C (vcpkg). Two bonus ecosystems (GitHub Actions, Docker)
+# are included to show breadth across CI/CD and containers.
+#
+# NOTE: GitHub retired the `reviewers:` config option in May 2025 — reviewer
+# assignment for Dependabot PRs is now handled via a CODEOWNERS file, not here.
+#
+# NOTE: Security updates (auto-PRs for GHSA-matched vulnerabilities) are a
+# separate toggle under Settings > Code security and analysis. This file only
+# controls VERSION updates, except where a setting is shared (noted inline).
+#
+# NOTE: No auto-merge or auto-approve automation is configured anywhere here.
+# All PRs require manual human review and merge — intentional, by design.
+
+version: 2
+
+# Combine the bonus infra ecosystems (Actions + Docker) into a single PR per cycle
+multi-ecosystem-groups:
+  infra:
+    schedule:
+      interval: "weekly"
+
+updates:
+
+  # ---------- Node.js + TypeScript (npm) ----------
+  - package-ecosystem: "npm"
+    directories:
+      - "/services/api-node"
+      - "/services/cli-typescript"
+      # `directories` (plural) also supports globbing, e.g. "/services/*-node"
+    schedule:
+      interval: "daily"
+    cooldown:
+      default-days: 3
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+    versioning-strategy: "increase-if-necessary"
+    groups:
+      npm-minor-patch:
+        applies-to: "version-updates"
+        update-types: ["minor", "patch"]
+        group-by: "dependency-name"   # merges the same dep across both directories into one PR
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+    # Review routing is intentionally handled with .github/CODEOWNERS.
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore-dev"
+      include: "scope"
+    pull-request-branch-name:
+      separator: "-"
+
+  # ---------- Python (pip) ----------
+  - package-ecosystem: "pip"
+    directory: "/services/worker-python"
+    # Uses the repository default branch so the live demo does not depend on a pre-created develop branch.
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kolkata"
+    ignore:
+      - dependency-name: "pyyaml"
+        versions: ["6.x"]
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps(python)"
+
+  # ---------- Java (Maven) ----------
+  - package-ecosystem: "maven"
+    directory: "/services/reporting-java"
+    schedule:
+      interval: "weekly"
+    groups:
+      java-prod:
+        dependency-type: "production"
+        applies-to: "version-updates"
+    ignore:
+      - dependency-name: "org.springframework*"
+        update-types: ["version-update:semver-major"]
+    labels:
+      - "dependencies"
+      - "java"
+    commit-message:
+      prefix: "deps(java)"
+
+  # ---------- C (vcpkg) ----------
+  - package-ecosystem: "vcpkg"
+    directory: "/services/native-c"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 5
+    labels:
+      - "dependencies"
+      - "c"
+    commit-message:
+      prefix: "deps(c)"
+    # vcpkg version updates are mature; vcpkg SECURITY alerts are not yet as
+    # mature as npm/pip/maven — call this out live during the demo.
+
+  # ---------- Bonus: GitHub Actions ----------
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    multi-ecosystem-group: "infra"
+    labels:
+      - "dependencies"
+      - "ci"
+
+  # ---------- Bonus: Docker ----------
+  - package-ecosystem: "docker"
+    directory: "/docker"
+    multi-ecosystem-group: "infra"
+    labels:
+      - "dependencies"
+      - "docker"
+
+# To unblock noisy PRs you don't want right now without losing visibility,
+# disabling-and-documenting is preferred over silent ignore rules — see
+# open-pull-requests-limit: 0 as an option per ecosystem if ever needed.
+
+# Optional top-level key if any service later needs a private registry:
+# registries:
+#   my-private-npm:
+#     type: npm-registry
+#     url: https://npm.pkg.github.com
+#     token: ${{secrets.MY_NPM_TOKEN}}

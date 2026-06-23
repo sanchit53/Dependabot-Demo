@@ -1,0 +1,9 @@
+# Demo ownership for Dependabot PR review routing.
+# Replace these placeholder teams with real org teams before presenting from a production org.
+/services/reporting-java/ @your-org/java-team @your-org/security-team
+/services/api-node/ @your-org/node-team @your-org/security-team
+/services/cli-typescript/ @your-org/frontend-team @your-org/security-team
+/services/worker-python/ @your-org/python-team @your-org/security-team
+/services/native-c/ @your-org/platform-team @your-org/security-team
+/docker/ @your-org/platform-team @your-org/security-team
+/.github/workflows/ @your-org/devsecops-team @your-org/security-team

@@ -1,0 +1,8 @@
+# Local build and dependency artifacts
+node_modules/
+dist/
+target/
+build/
+.venv/
+__pycache__/
+*.py[cod]
