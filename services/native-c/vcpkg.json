@@ -1,0 +1,1 @@
+{"name":"c-dependabot-demo","version-string":"1.0.0","builtin-baseline":"4c1db68a2a6708b4f18d06fd1d9a162a14c0e646","dependencies":["curl","openssl","zlib","libpng","libxml2","sqlite3"]}

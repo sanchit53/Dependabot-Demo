@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.20)
+project(c_dependabot_demo C)
+add_executable(c-service main.c)
+find_package(CURL CONFIG REQUIRED)
+target_link_libraries(c-service PRIVATE CURL::libcurl)

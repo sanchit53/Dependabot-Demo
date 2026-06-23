@@ -1,0 +1,29 @@
+name: Demo CI
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  manifest-smoke:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Validate demo manifests
+        run: |
+          python - <<'PY'
+          import json
+          import pathlib
+          import xml.etree.ElementTree as ET
+
+          for package_json in pathlib.Path('.').glob('services/*/package.json'):
+              json.loads(package_json.read_text())
+              print(f'validated {package_json}')
+
+          json.loads(pathlib.Path('services/native-c/vcpkg.json').read_text())
+          ET.parse('services/reporting-java/pom.xml')
+          print('validated vcpkg.json and pom.xml')
+          PY
+      - name: Compile Python service
+        run: python -m py_compile services/worker-python/app.py
